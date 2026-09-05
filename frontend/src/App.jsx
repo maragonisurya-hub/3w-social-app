@@ -13,7 +13,7 @@ function App() {
 
   useEffect(() => {
     if (loggedIn) {
-      fetch("http://localhost:5000/api/posts")
+      fetch("https://threew-social-app-v4z8.onrender.com/api/posts")
         .then((res) => res.json())
         .then((data) => setPosts(data));
     }
@@ -27,10 +27,12 @@ function App() {
     <main className="app">
       <header className="header">
         <h1>Social</h1>
-       <div className="header-user">
-  <span>👤</span>
-  <span>{localStorage.getItem("username")}</span>
-</div>
+
+        <div className="header-user">
+          <span>👤</span>
+          <span>{localStorage.getItem("username")}</span>
+        </div>
+
         <button
           className="logout"
           onClick={() => {
@@ -79,31 +81,40 @@ function App() {
                 const file = e.target.files[0];
 
                 if (file) {
-  const reader = new FileReader();
+                  const reader = new FileReader();
 
-  reader.onload = () => {
-    const img = new Image();
+                  reader.onload = () => {
+                    const img = new Image();
 
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
+                    img.onload = () => {
+                      const canvas = document.createElement("canvas");
 
-      const maxWidth = 1200;
-      const scale = Math.min(1, maxWidth / img.width);
+                      const maxWidth = 1200;
+                      const scale = Math.min(1, maxWidth / img.width);
 
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
+                      canvas.width = img.width * scale;
+                      canvas.height = img.height * scale;
 
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                      const ctx = canvas.getContext("2d");
 
-      setImage(canvas.toDataURL("image/jpeg", 0.8));
-    };
+                      ctx.drawImage(
+                        img,
+                        0,
+                        0,
+                        canvas.width,
+                        canvas.height
+                      );
 
-    img.src = reader.result;
-  };
+                      setImage(
+                        canvas.toDataURL("image/jpeg", 0.8)
+                      );
+                    };
 
-  reader.readAsDataURL(file);
-}
+                    img.src = reader.result;
+                  };
+
+                  reader.readAsDataURL(file);
+                }
               }}
             />
           </label>
@@ -116,7 +127,7 @@ function App() {
               }
 
               const response = await fetch(
-                "http://localhost:5000/api/posts",
+                "https://threew-social-app-v4z8.onrender.com/api/posts",
                 {
                   method: "POST",
                   headers: {
@@ -133,7 +144,7 @@ function App() {
               const data = await response.json();
 
               if (response.ok) {
-                setPosts([data, ...posts]);
+                setPosts((currentPosts) => [data, ...currentPosts]);
                 setText("");
                 setImage("");
                 alert("Post created");
@@ -160,7 +171,7 @@ function App() {
 
             onLike={async (id) => {
               const response = await fetch(
-                `http://localhost:5000/api/posts/${id}/like`,
+                `https://threew-social-app-v4z8.onrender.com/api/posts/${id}/like`,
                 {
                   method: "PUT",
                   headers: {
@@ -171,24 +182,24 @@ function App() {
                 }
               );
 
-              const updatedPost = await response.json();
+              const data = await response.json();
 
               if (response.ok) {
                 setPosts((currentPosts) =>
                   currentPosts.map((item) =>
-                    item._id === updatedPost._id
-                      ? updatedPost
+                    item._id === data._id
+                      ? { ...item, likes: data.likes }
                       : item
                   )
                 );
               } else {
-                alert(updatedPost.message);
+                alert(data.message);
               }
             }}
 
             onComment={async (id, text) => {
               const response = await fetch(
-                `http://localhost:5000/api/posts/${id}/comment`,
+                `https://threew-social-app-v4z8.onrender.com/api/posts/${id}/comment`,
                 {
                   method: "PUT",
                   headers: {
@@ -201,24 +212,24 @@ function App() {
                 }
               );
 
-              const updatedPost = await response.json();
+              const data = await response.json();
 
               if (response.ok) {
                 setPosts((currentPosts) =>
                   currentPosts.map((item) =>
-                    item._id === updatedPost._id
-                      ? updatedPost
+                    item._id === data._id
+                      ? { ...item, comments: data.comments }
                       : item
                   )
                 );
               } else {
-                alert(updatedPost.message);
+                alert(data.message);
               }
             }}
 
             onDelete={async (id) => {
               const response = await fetch(
-                `http://localhost:5000/api/posts/${id}`,
+                `https://threew-social-app-v4z8.onrender.com/api/posts/${id}`,
                 {
                   method: "DELETE",
                   headers: {
